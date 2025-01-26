@@ -32,7 +32,6 @@ class BotCommandLog implements ILogMessage {
      * @param message Message to add to the Log
      */
     public AddLogMessage(message: BotCommunication) {
-        console.log("Adding Log Message");
         if (message.content)
             this.LogMessage = message.content;
     }

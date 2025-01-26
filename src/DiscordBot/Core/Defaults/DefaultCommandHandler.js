@@ -42,7 +42,6 @@ class DefaultCommandHandler {
                     if (error instanceof Error)
                         commandData.DataManager.AddErrorLog(error);
                 }
-                console.log("Command Finished");
                 commandData.DataManager.BotCommandUnblock();
                 const log = new BotCommandLog_1.default(commandData.CommandInteraction);
                 if (command.Response)

@@ -90,26 +90,16 @@ class Job {
         return __awaiter(this, void 0, void 0, function* () {
             if (!attachement)
                 return;
-            console.log(`Downloading File: ${attachement.name}`);
-            console.log(`Downloading File: ${attachement.url}`);
-            console.log(`Downloading File: ${attachement.proxyURL}`);
             try {
                 const response = yield (0, axios_1.default)({
                     method: 'GET',
                     url: attachement.url,
                     responseType: 'stream',
                 });
-                console.log(`Sent Axios Request`);
                 let writer = fs_1.default.createWriteStream(`${this.JobDirectory}/${attachement.name}`);
-                console.log(`Created Write Stream`);
                 yield response.data.pipe(writer);
-                console.log(`Piped Data`);
                 return new Promise((resolve, reject) => {
-                    console.log(`Returning Promise`);
-                    writer.on('finish', () => {
-                        console.log(`Finished Writing`);
-                        resolve();
-                    });
+                    writer.on('finish', () => resolve());
                     writer.on('error', reject);
                 });
             }
@@ -187,13 +177,9 @@ class Job {
     }
     Setup(attachments) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`Removing Dir`);
             yield this.RemoveDirectories();
-            console.log(`Create Dir`);
             yield this.CreateDirectories();
-            console.log(`Download Files`);
             yield this.DownloadFiles(attachments);
-            console.log(`Finished Setup`);
         });
     }
     SendArchive(message, tooLargeMessage) {

@@ -37,9 +37,7 @@ class DefaultCommandHandler implements ICommandHandler {
                 if (error instanceof Error)
                     commandData.DataManager.AddErrorLog(error);
             }
-
-            console.log("Command Finished");
-
+            
             commandData.DataManager.BotCommandUnblock();
             const log: BotCommandLog = new BotCommandLog(commandData.CommandInteraction);
             if (command.Response)

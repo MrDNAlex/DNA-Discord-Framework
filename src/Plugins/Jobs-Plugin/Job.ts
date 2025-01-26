@@ -76,7 +76,6 @@ abstract class Job implements IJob {
             fs.rmSync(this.ArchiveDirectory, { recursive: true, force: true });
     }
 
-
     /* <inheritdoc> */
     public CreateDirectories() {
         if (this.JobDirectory === "")
@@ -130,9 +129,6 @@ abstract class Job implements IJob {
         if (!attachement)
             return
 
-        console.log(`Downloading File: ${attachement.name}`);
-        console.log(`Downloading File: ${attachement.url}`);
-        console.log(`Downloading File: ${attachement.proxyURL}`);
         try {
             const response = await axios({
                 method: 'GET',
@@ -140,21 +136,12 @@ abstract class Job implements IJob {
                 responseType: 'stream',
             });
 
-            console.log(`Sent Axios Request`);
-
             let writer = fs.createWriteStream(`${this.JobDirectory}/${attachement.name}`);
-
-            console.log(`Created Write Stream`);
 
             await response.data.pipe(writer);
 
-            console.log(`Piped Data`);
-
             return new Promise<void>((resolve, reject) => {
-                console.log(`Returning Promise`);
-                writer.on('finish', () => {
-                    console.log(`Finished Writing`);
-                    resolve();});
+                writer.on('finish', () => resolve());
                 writer.on('error', reject);
             });
         } catch (error) {
@@ -230,13 +217,9 @@ abstract class Job implements IJob {
     }
 
     public async Setup (attachments: (Attachment | null)[]) : Promise<void> {
-        console.log(`Removing Dir`);
         await this.RemoveDirectories();
-        console.log(`Create Dir`);
         await this.CreateDirectories();
-        console.log(`Download Files`);
         await this.DownloadFiles(attachments);
-        console.log(`Finished Setup`);
     }
 
     public async SendArchive(message: BotCommunication, tooLargeMessage: string): Promise<void> {
