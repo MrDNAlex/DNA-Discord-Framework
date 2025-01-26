@@ -58,11 +58,17 @@ class Job {
     /* <inheritdoc> */
     JobElapsedTime() {
         const now = Date.now();
-        const elapsed = new Date(now - this.StartTime);
-        const hours = elapsed.getUTCHours();
-        const minutes = elapsed.getUTCMinutes();
-        const seconds = elapsed.getUTCSeconds();
-        if (hours > 0)
+        const elapsed = new Date(now - this.StartTime).getTime() / 1000;
+        const weeks = Math.floor(elapsed / 604800);
+        const days = Math.floor(elapsed / 86400) - weeks * 7;
+        const hours = Math.floor(elapsed / 3600) - weeks * 168 - days * 24;
+        const minutes = Math.floor(elapsed / 60) - weeks * 10080 - days * 1440 - hours * 60;
+        const seconds = Math.floor(elapsed) - weeks * 604800 - days * 86400 - hours * 3600 - minutes * 60;
+        if (weeks > 0)
+            return `${weeks} w:${days} d:${hours} h:${minutes} m:${seconds} s`;
+        else if (days > 0)
+            return `${days} d:${hours} h:${minutes} m:${seconds} s`;
+        else if (hours > 0)
             return `${hours} h:${minutes} m:${seconds} s`;
         else if (minutes > 0)
             return `${minutes} m:${seconds} s`;
@@ -84,21 +90,31 @@ class Job {
         return __awaiter(this, void 0, void 0, function* () {
             if (!attachement)
                 return;
+            console.log(`Downloading File: ${attachement.name}`);
+            console.log(`Downloading File: ${attachement.url}`);
+            console.log(`Downloading File: ${attachement.proxyURL}`);
             try {
                 const response = yield (0, axios_1.default)({
                     method: 'GET',
                     url: attachement.url,
                     responseType: 'stream',
                 });
+                console.log(`Sent Axios Request`);
                 let writer = fs_1.default.createWriteStream(`${this.JobDirectory}/${attachement.name}`);
+                console.log(`Created Write Stream`);
                 yield response.data.pipe(writer);
+                console.log(`Piped Data`);
                 return new Promise((resolve, reject) => {
-                    writer.on('finish', resolve);
+                    console.log(`Returning Promise`);
+                    writer.on('finish', () => {
+                        console.log(`Finished Writing`);
+                        resolve();
+                    });
                     writer.on('error', reject);
                 });
             }
             catch (error) {
-                console.error(`Failed to download the file: ${error}`);
+                console.log(`Failed to download the file: ${error}`);
             }
         });
     }
@@ -171,9 +187,13 @@ class Job {
     }
     Setup(attachments) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Removing Dir`);
             yield this.RemoveDirectories();
+            console.log(`Create Dir`);
             yield this.CreateDirectories();
+            console.log(`Download Files`);
             yield this.DownloadFiles(attachments);
+            console.log(`Finished Setup`);
         });
     }
     SendArchive(message, tooLargeMessage) {

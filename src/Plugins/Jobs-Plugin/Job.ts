@@ -7,7 +7,6 @@ import SizeFormat from "./SizeFormat";
 import BotCommunication from "../../DiscordBot/Core/Communication/BotCommunication";
 import BotDataManager from "../../DiscordBot/Core/Data/BotDataManager";
 import BashScriptRunner from "../Bash-Plugin/BashScriptRunner";
-import BotData from "../../DiscordBot/Core/Data/BotData";
 
 abstract class Job implements IJob {
 
@@ -96,12 +95,18 @@ abstract class Job implements IJob {
     /* <inheritdoc> */
     public JobElapsedTime(): string {
         const now = Date.now();
-        const elapsed = new Date(now - this.StartTime);
-        const hours = elapsed.getUTCHours();
-        const minutes = elapsed.getUTCMinutes();
-        const seconds = elapsed.getUTCSeconds();
-
-        if (hours > 0)
+        const elapsed = new Date(now - this.StartTime).getTime()/1000;
+        const weeks = Math.floor(elapsed / 604800);
+        const days = Math.floor(elapsed / 86400) - weeks * 7;
+        const hours = Math.floor(elapsed / 3600) - weeks * 168 - days * 24;
+        const minutes = Math.floor(elapsed / 60) - weeks * 10080 - days * 1440 - hours * 60;
+        const seconds = Math.floor(elapsed) - weeks * 604800 - days * 86400 - hours * 3600 - minutes * 60;
+        
+        if (weeks > 0)
+            return `${weeks} w:${days} d:${hours} h:${minutes} m:${seconds} s`;
+        else if (days > 0)
+            return `${days} d:${hours} h:${minutes} m:${seconds} s`;
+        else if (hours > 0)
             return `${hours} h:${minutes} m:${seconds} s`;
         else if (minutes > 0)
             return `${minutes} m:${seconds} s`;
@@ -125,6 +130,9 @@ abstract class Job implements IJob {
         if (!attachement)
             return
 
+        console.log(`Downloading File: ${attachement.name}`);
+        console.log(`Downloading File: ${attachement.url}`);
+        console.log(`Downloading File: ${attachement.proxyURL}`);
         try {
             const response = await axios({
                 method: 'GET',
@@ -132,16 +140,25 @@ abstract class Job implements IJob {
                 responseType: 'stream',
             });
 
+            console.log(`Sent Axios Request`);
+
             let writer = fs.createWriteStream(`${this.JobDirectory}/${attachement.name}`);
+
+            console.log(`Created Write Stream`);
 
             await response.data.pipe(writer);
 
-            return new Promise((resolve, reject) => {
-                writer.on('finish', resolve);
+            console.log(`Piped Data`);
+
+            return new Promise<void>((resolve, reject) => {
+                console.log(`Returning Promise`);
+                writer.on('finish', () => {
+                    console.log(`Finished Writing`);
+                    resolve();});
                 writer.on('error', reject);
             });
         } catch (error) {
-            console.error(`Failed to download the file: ${error}`);
+            console.log(`Failed to download the file: ${error}`);
         }
     }
 
@@ -213,9 +230,13 @@ abstract class Job implements IJob {
     }
 
     public async Setup (attachments: (Attachment | null)[]) : Promise<void> {
+        console.log(`Removing Dir`);
         await this.RemoveDirectories();
+        console.log(`Create Dir`);
         await this.CreateDirectories();
+        console.log(`Download Files`);
         await this.DownloadFiles(attachments);
+        console.log(`Finished Setup`);
     }
 
     public async SendArchive(message: BotCommunication, tooLargeMessage: string): Promise<void> {

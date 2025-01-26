@@ -31,10 +31,14 @@ class DefaultCommandHandler implements ICommandHandler {
             try {
                 await command.RunCommand(commandData.BotClient, commandData.CommandInteraction, commandData.DataManager);
             } catch (error) {
+                console.log("Error Running Command");
+                console.log(error);                
                 commandData.DataManager.BotCommandUnblock();
                 if (error instanceof Error)
                     commandData.DataManager.AddErrorLog(error);
             }
+
+            console.log("Command Finished");
 
             commandData.DataManager.BotCommandUnblock();
             const log: BotCommandLog = new BotCommandLog(commandData.CommandInteraction);

@@ -36,10 +36,13 @@ class DefaultCommandHandler {
                     yield command.RunCommand(commandData.BotClient, commandData.CommandInteraction, commandData.DataManager);
                 }
                 catch (error) {
+                    console.log("Error Running Command");
+                    console.log(error);
                     commandData.DataManager.BotCommandUnblock();
                     if (error instanceof Error)
                         commandData.DataManager.AddErrorLog(error);
                 }
+                console.log("Command Finished");
                 commandData.DataManager.BotCommandUnblock();
                 const log = new BotCommandLog_1.default(commandData.CommandInteraction);
                 if (command.Response)

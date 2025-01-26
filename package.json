@@ -1,6 +1,6 @@
 {
   "name": "dna-discord-framework",
-  "version": "1.0.159",
+  "version": "1.0.180",
   "description": "A node module that contains a Framework for building complex Discord Bots with ease and low barrier of entry",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
   "dependencies": {
     "@types/readline-sync": "1.4.8",
     "axios": "^1.7.7",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.17.3",
     "follow-redirects": "^1.15.6",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.2.0",

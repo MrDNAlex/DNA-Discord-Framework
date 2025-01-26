@@ -16,6 +16,7 @@ class BotCommandLog {
      * @param message Message to add to the Log
      */
     AddLogMessage(message) {
+        console.log("Adding Log Message");
         if (message.content)
             this.LogMessage = message.content;
     }
