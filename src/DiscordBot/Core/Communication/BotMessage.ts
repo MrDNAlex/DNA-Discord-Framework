@@ -1,7 +1,7 @@
-import { TextChannel } from "discord.js";
+import { TextChannel, MessageCreateOptions, MessageEditOptions} from "discord.js";
 import BotCommunication from "./BotCommunication";
 
-class BotMessage extends BotCommunication {
+class BotMessage extends BotCommunication implements MessageCreateOptions, MessageEditOptions {
     /**
     * The Command Interaction that the Response is associated with
     */

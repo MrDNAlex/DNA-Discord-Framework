@@ -1,14 +1,14 @@
-import { APIAttachment, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, InteractionResponse, InteractionResponseType, JSONEncodable, Message, MessageCreateOptions, MessageEditOptions } from "discord.js";
+import { APIAttachment, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, InteractionResponse, JSONEncodable, Message, BaseMessageOptions, MessageMentionOptions, APIEmbed } from "discord.js";
 import { Stream } from "stream";
 import fs from "fs";
 
 
-abstract class BotCommunication implements MessageCreateOptions, MessageEditOptions {
+abstract class BotCommunication implements BaseMessageOptions { 
 
     /**
      * The Maximum Number of Minutes that the Response is valid for
      */
-    public static MAX_RESPONSE_MINS: number = 15;
+    public static MAX_RESPONSE_MINS: number = 15 * (1000 * 60);
 
     /**
      * The Maximum Number of Edit Attempts for the Response
@@ -26,9 +26,14 @@ abstract class BotCommunication implements MessageCreateOptions, MessageEditOpti
     public content?: string = "";
 
     /**
-     * Boolean Flag to determine if the Message is Ephemeral
+     * Discord Embeds inside the Message
      */
-    public ephemeral?: boolean = false;
+    public embeds?: readonly (JSONEncodable<APIEmbed> | APIEmbed)[];
+
+    /**
+     * Mention Options for the Message
+     */
+    public allowedMentions?: MessageMentionOptions;
 
     /**
      * The Files associated with the Response
@@ -49,8 +54,6 @@ abstract class BotCommunication implements MessageCreateOptions, MessageEditOpti
      * The Communication object that is sent to the User
      */
     public CommunicationInstance: InteractionResponse | Message<true> | undefined;
-
-    //Add a get link function
 
     /**
      * Gets the Link of the Communication Instance
@@ -124,7 +127,7 @@ abstract class BotCommunication implements MessageCreateOptions, MessageEditOpti
      * Waiting Loop for the Message to be Received
      * @param count The Number of Times the Loop has Run through iterations
      */
-    protected UpdateMessageLoop (count: number = 0): void {
+    protected UpdateMessageLoop(count: number = 0): void {
         if (count > BotCommunication.MAX_EDIT_ATTEMPTS)
             return console.log("Message has Taken too long to edit");
 
