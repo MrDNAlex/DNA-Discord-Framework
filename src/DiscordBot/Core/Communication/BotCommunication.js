@@ -16,10 +16,6 @@ class BotCommunication {
          */
         this.content = "";
         /**
-         * Boolean Flag to determine if the Message is Ephemeral
-         */
-        this.ephemeral = false;
-        /**
          * The Files associated with the Response
          */
         this.files = [];
@@ -32,7 +28,6 @@ class BotCommunication {
          */
         this._MessageReceived = false;
     }
-    //Add a get link function
     /**
      * Gets the Link of the Communication Instance
      * @returns The Link of the Communication Instance
@@ -102,7 +97,7 @@ class BotCommunication {
 /**
  * The Maximum Number of Minutes that the Response is valid for
  */
-BotCommunication.MAX_RESPONSE_MINS = 15;
+BotCommunication.MAX_RESPONSE_MINS = 15 * (1000 * 60);
 /**
  * The Maximum Number of Edit Attempts for the Response
  */
